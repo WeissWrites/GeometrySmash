@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Spike
+  - Platform
+  - SmashCoin
+  - Audio
+  - Goal
   layers:
   - Default
   - TransparentFX
@@ -15,7 +20,7 @@ TagManager:
   - Spike
   - Platform
   - 
-  - 
+  - PostProcessing
   - 
   - 
   - 

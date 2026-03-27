@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -11,12 +12,19 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask GroundMask;
     public Transform PlayerSprite;
     public GameManager GameOver;
+    public AudioManager audioManager;
 
     private Rigidbody2D rb;
     private float lastJumpTime;
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
     private bool isJumping;
+    public int SmashCoins = 0;
+
+    void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Start()
     {
@@ -43,7 +51,6 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-            // Rotate in air
             PlayerSprite.Rotate(Vector3.back * 500 * Time.deltaTime);
         }
 
@@ -71,6 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (wallHit.collider != null && wallHit.collider.CompareTag("Platform"))
         {
+            audioManager.PlaySFX(audioManager.death);
             GameOver.Restart();
         }
 
@@ -94,18 +102,29 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Spike"))
         {
+            audioManager.PlaySFX(audioManager.death);
             GameOver.Restart();
         }
+    }
 
-        if (collision.gameObject.CompareTag("Platform"))
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("SmashCoin"))
         {
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                if (contact.normal.y < -0.5f)
-                {
-                    GameOver.Restart();
-                }
-            }
+            SmashCoins++;
+            audioManager.PlaySFX(audioManager.smashCoin);
+            other.GetComponent<Animator>().SetTrigger("PickedUp");
+            other.enabled = false;
+            Destroy(other.gameObject, 1.1f);
+            Debug.Log("You have " + SmashCoins + " Smash Coins!");
+        }
+        if (other.CompareTag("Goal"))
+        {
+            Debug.Log("Level Finished!");
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            FindFirstObjectByType<EndLevelSequence>().StartFinishSequence(this.transform);
+
         }
     }
 
@@ -114,6 +133,11 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R)) TeleportToPoint(0);
         if (Input.GetKeyDown(KeyCode.Alpha1)) TeleportToPoint(1);
         if (Input.GetKeyDown(KeyCode.Alpha2)) TeleportToPoint(2);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) TeleportToPoint(3);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) TeleportToPoint(4);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) TeleportToPoint(5);
+        if (Input.GetKeyDown(KeyCode.Alpha6)) TeleportToPoint(6);
+        if (Input.GetKeyDown(KeyCode.Alpha7)) TeleportToPoint(7);
     }
 
     void TeleportToPoint(int index)
