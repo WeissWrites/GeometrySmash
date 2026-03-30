@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 public class AudioManager : MonoBehaviour
 {
     [Header("Audio Source")]
-    [SerializeField] AudioSource musicSource;
+    [SerializeField] public AudioSource musicSource;
     [SerializeField] AudioSource sfxSource;
 
     [Header("Audio Clip")]
@@ -13,9 +13,10 @@ public class AudioManager : MonoBehaviour
     public AudioClip death;
     public AudioClip smashCoin;
 
-    void Start()
+    public static AudioManager instance;
+    void Awake()
     {
-
+        instance = this;
     }
 
     public void PlaySFX(AudioClip clip)
@@ -27,7 +28,6 @@ public class AudioManager : MonoBehaviour
     {
         musicSource.clip = levelBackgroundMusic;
         musicSource.Stop();
-        musicSource.time = 0;
         musicSource.Play();
     }
 

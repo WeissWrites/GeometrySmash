@@ -14,12 +14,14 @@ public class PlayerMovement : MonoBehaviour
     public GameManager GameOver;
     public AudioManager audioManager;
 
+
     private Rigidbody2D rb;
     private float lastJumpTime;
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
     private bool isJumping;
     public int SmashCoins = 0;
+
 
     void Awake()
     {
@@ -115,17 +117,24 @@ public class PlayerMovement : MonoBehaviour
             audioManager.PlaySFX(audioManager.smashCoin);
             other.GetComponent<Animator>().SetTrigger("PickedUp");
             other.enabled = false;
-            Destroy(other.gameObject, 1.1f);
-            Debug.Log("You have " + SmashCoins + " Smash Coins!");
+            if (other.TryGetComponent(out SmashCoin coinScript))
+            {
+                GameManager.instance.CollectCoin(coinScript.coinIndex);
+            }
+            StartCoroutine(HideCoinAfterDelay(other.gameObject, 1.1f));
         }
         if (other.CompareTag("Goal"))
         {
-            Debug.Log("Level Finished!");
             rb.linearVelocity = Vector2.zero;
             rb.bodyType = RigidbodyType2D.Kinematic;
             FindFirstObjectByType<EndLevelSequence>().StartFinishSequence(this.transform);
 
         }
+    }
+    IEnumerator HideCoinAfterDelay(GameObject coin, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        coin.SetActive(false);
     }
 
     void HandleDevTeleport()

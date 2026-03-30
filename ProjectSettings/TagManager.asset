@@ -9,6 +9,7 @@ TagManager:
   - SmashCoin
   - Audio
   - Goal
+  - JumpPoint
   layers:
   - Default
   - TransparentFX
